@@ -1,4 +1,7 @@
 
+using Geolocation_Task.Repositories;
+using Geolocation_Task.Services;
+
 namespace Geolocation_Task
 {
     public class Program
@@ -8,7 +11,10 @@ namespace Geolocation_Task
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddHttpClient();
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddSingleton<IBlockedCountryRepository, BlockedCountryRepository>();
+            builder.Services.AddScoped<IIpService, IpService>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
