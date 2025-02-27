@@ -16,6 +16,8 @@ namespace Geolocation_Task
             builder.Services.AddSingleton<IBlockedCountryRepository, BlockedCountryRepository>();
             builder.Services.AddScoped<IIpService, IpService>();
             builder.Services.AddControllers();
+            builder.Services.AddHostedService<UnBlockExpiredCountries>();
+            builder.Services.AddSingleton<ITemoprallyBlocked, TemporallyBlocked>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

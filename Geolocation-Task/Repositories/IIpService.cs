@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using static Geolocation_Task.Services.IpService;
 
 namespace Geolocation_Task.Repositories
 {
     public interface IIpService
     {
 
-        Task<object> GetCountryCode(string ip);
+        Task<ApiResponse> GetCountryCode(string? ip=null);
     }
 }

@@ -4,6 +4,7 @@
     {
         bool AddBlockedCountry(string country);
         bool RemoveBlockedCountry(string country);
-        List<string> GetAllBlockedCountries();
+        List<string> GetAllBlockedCountries(int? page = null, int? pageSize = null);
+        bool CheckCountry(string countryCode);
     }
 }
