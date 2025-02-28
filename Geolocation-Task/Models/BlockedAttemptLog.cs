@@ -1,4 +1,4 @@
-﻿namespace Geolocation_Task.Repositories
+﻿namespace Geolocation_Task.Models
 {
     
         public class BlockedAttemptLog

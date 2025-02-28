@@ -15,17 +15,17 @@ namespace Geolocation_Task.Services
         {
             var query = _blockedCountries.AsEnumerable();
 
-            // 🔍 Search by country code or name
+           
             if (!string.IsNullOrWhiteSpace(search))
             {
                 string searchLower = search.ToLower();
                 query = query.Where(c => c.Key.ToLower().Contains(searchLower) || c.Value.ToLower().Contains(searchLower));
             }
 
-            // 📌 Sorting by country code
+           
             query = query.OrderBy(k => k.Key);
 
-            // 📖 Apply pagination if parameters are provided
+            
             if (page.HasValue && pageSize.HasValue)
             {
                 query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);

@@ -3,6 +3,7 @@
 namespace Geolocation_Task.Services
 {
     using global::Geolocation_Task.Controllers;
+    using global::Geolocation_Task.Models;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;

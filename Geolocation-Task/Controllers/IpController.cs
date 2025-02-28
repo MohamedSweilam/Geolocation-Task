@@ -13,18 +13,18 @@ namespace Geolocation_Task.Controllers
         private readonly IIpService _ipService;
         private readonly IBlockedCountryRepository _blockedCountry;
         private readonly ITemoprallyBlocked _temoprallyBlocked;
-        private readonly ILogAttemptsService _logAttemptsService; // Add this
+        private readonly ILogAttemptsService _logAttemptsService; 
 
         public IpController(
             IIpService ipService,
             IBlockedCountryRepository blockedCountry,
             ITemoprallyBlocked temoprallyBlocked,
-            ILogAttemptsService logAttemptsService) // Inject here
+            ILogAttemptsService logAttemptsService) 
         {
             _ipService = ipService;
             _blockedCountry = blockedCountry;
             _temoprallyBlocked = temoprallyBlocked;
-            _logAttemptsService = logAttemptsService; // Assign here
+            _logAttemptsService = logAttemptsService; 
         }
 
         [HttpGet("lookup")]
@@ -70,44 +70,6 @@ namespace Geolocation_Task.Controllers
             return Ok(result);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //[HttpGet("check-block")]
-    //public async Task<IActionResult> CheckBlock()
-    //{
-
-    //      var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-
-    //    if (string.IsNullOrEmpty(ip))
-    //        return BadRequest("Unable to determine the IP address.");
-
-    //    var result = await _ipService.GetCountryCode(ip);
-
-    //    if (_blockedCountry.CheckCountry(result.country_code))
-    //        return Conflict($"Blocked");
-    //    if (_temoprallyBlocked.IsCountryTemporarilyBlocked(result.country_code))
-    //        return Conflict($" Temporalily Blocked");
-
-    //    return Ok(result);
-
-    //}
 
 }
 

@@ -23,13 +23,13 @@ namespace Geolocation_Task.Services
                 ip = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString();
 
 
-            ip = _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                  ?? _httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString();
+            //ip = _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()   // if u want to test real IP not localhost
+            //      ?? _httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString();
             
 
             if (IPAddress.TryParse(ip, out _))
             {
-                var apiKey = _config["IpStack:IpStackKey"];
+                var apiKey = _config["IpStack:IpStackKey"];   // Put ur Key in appsettings.json
                 var apiUrl = _config["IpStack:IpStackUrl"];
                 var response = await _httpClient.GetAsync($"{apiUrl}{ip}?access_key={apiKey}");
                 response.EnsureSuccessStatusCode();

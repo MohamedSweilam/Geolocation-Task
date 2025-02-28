@@ -1,4 +1,5 @@
-﻿using Geolocation_Task.Repositories;
+﻿using Geolocation_Task.Models;
+using Geolocation_Task.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ namespace Geolocation_Task.Controllers
             _ipService = ipService;
         }
         [HttpGet("blocked")]
-        public IActionResult GetAllBlockedCountries([FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+        public   IActionResult GetAllBlockedCountries([FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
         {
             // Validate pagination parameters
             if ((page.HasValue && !pageSize.HasValue) || (!page.HasValue && pageSize.HasValue))
@@ -27,7 +28,7 @@ namespace Geolocation_Task.Controllers
                 return BadRequest("Both page and pageSize must be provided together.");
             }
 
-            var blockedCountries = _countryService.GetAllBlockedCountries(search, page, pageSize);
+            var blockedCountries =  _countryService.GetAllBlockedCountries(search, page, pageSize);
 
             if (!blockedCountries.Any())
             {
@@ -39,15 +40,15 @@ namespace Geolocation_Task.Controllers
 
 
         [HttpPost("block")]
-        public IActionResult AddBlockedCountry([FromBody] Result res)
+        public IActionResult AddBlockedCountry([FromBody] BlockedCountryRequest req)
         {
-            if (string.IsNullOrWhiteSpace(res.CountryCode) || string.IsNullOrWhiteSpace(res.CountryName))
+            if (string.IsNullOrWhiteSpace(req.CountryCode) || string.IsNullOrWhiteSpace(req.CountryName))
             {
                 return BadRequest("Country code and country name cannot be empty.");
             }
 
-            var result = _countryService.AddBlockedCountry(res.CountryCode.ToUpper(), res.CountryName);
-            return result ? Ok($"{res.CountryName} ({res.CountryCode}) has been blocked") : Conflict($"{res.CountryName} is already blocked.");
+            var result = _countryService.AddBlockedCountry(req.CountryCode.ToUpper(), req.CountryName);
+            return result ? Ok($"{req.CountryName} ({req.CountryCode}) has been blocked") : Conflict($"{req.CountryName} is already blocked.");
         }
 
             [HttpDelete("block/{countryCode}")]
@@ -69,7 +70,7 @@ namespace Geolocation_Task.Controllers
             if (res.CountryCode==null)
 
             {
-                return BadRequest("Invalid country code format.");
+                return  BadRequest("Invalid country code format.");
             }           
 
             if (res.DurationMinutes < 1 || res.DurationMinutes > 1440)
@@ -84,17 +85,18 @@ namespace Geolocation_Task.Controllers
             }
 
             // Block the country
-            _temoprallyBlock.TemporarilyBlockCountry(res.CountryCode, res.DurationMinutes);
+             _temoprallyBlock.TemporarilyBlockCountry(res.CountryCode, res.DurationMinutes);
 
-            return Ok($"{res.CountryCode} has been blocked for {res.DurationMinutes} minutes.");
+             return Ok($"{res.CountryCode} has been blocked for {res.DurationMinutes} minutes.");
         }
 
         public class Result 
         {
             public int DurationMinutes { get; set; }
             public string CountryCode { get; set; }
-            public string CountryName { get; set; }
         }
+
+       
 
 
     }

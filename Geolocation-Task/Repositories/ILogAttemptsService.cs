@@ -1,4 +1,5 @@
 ﻿using Geolocation_Task.Controllers;
+using Geolocation_Task.Models;
 
 namespace Geolocation_Task.Repositories
 {

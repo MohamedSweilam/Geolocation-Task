@@ -11,7 +11,7 @@ namespace Geolocation_Task.Services
         public bool TemporarilyBlockCountry(string countryCode, int durationMinutes)
         {
             if (_temporallyBlockedCountries.ContainsKey(countryCode))
-                return false; // Already blocked
+                return false; 
 
             _temporallyBlockedCountries[countryCode] = DateTime.UtcNow.AddMinutes(durationMinutes);
             return true;
@@ -22,9 +22,9 @@ namespace Geolocation_Task.Services
             if (_temporallyBlockedCountries.TryGetValue(countryCode, out DateTime expiryTime))
             {
                 if (expiryTime > DateTime.UtcNow)
-                    return true; // Still blocked
+                    return true;
 
-                _temporallyBlockedCountries.TryRemove(countryCode, out _); // Remove expired block
+                _temporallyBlockedCountries.TryRemove(countryCode, out _); 
             }
             return false;
         }
