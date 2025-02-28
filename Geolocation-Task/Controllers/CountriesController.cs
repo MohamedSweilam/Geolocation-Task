@@ -19,28 +19,45 @@ namespace Geolocation_Task.Controllers
             _ipService = ipService;
         }
         [HttpGet("blocked")]
-        public IActionResult GetAll([FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+        public IActionResult GetAllBlockedCountries([FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
         {
-            var data = _countryService.GetAllBlockedCountries(page, pageSize);
+            // Validate pagination parameters
+            if ((page.HasValue && !pageSize.HasValue) || (!page.HasValue && pageSize.HasValue))
+            {
+                return BadRequest("Both page and pageSize must be provided together.");
+            }
 
-            return data == null ? NotFound() : Ok(data);
+            var blockedCountries = _countryService.GetAllBlockedCountries(search, page, pageSize);
+
+            if (!blockedCountries.Any())
+            {
+                return NotFound("No blocked countries found matching the criteria.");
+            }
+
+            return Ok(blockedCountries);
         }
 
 
         [HttpPost("block")]
-        public IActionResult AddBlockedCountry([FromBody] string countryCode)
+        public IActionResult AddBlockedCountry([FromBody] Result res)
         {
-            var result = _countryService.AddBlockedCountry(countryCode);
-            return result == true ? Ok($"{countryCode} has been blocked") : Conflict($"{countryCode} is already blocked");
+            if (string.IsNullOrWhiteSpace(res.CountryCode) || string.IsNullOrWhiteSpace(res.CountryName))
+            {
+                return BadRequest("Country code and country name cannot be empty.");
+            }
+
+            var result = _countryService.AddBlockedCountry(res.CountryCode.ToUpper(), res.CountryName);
+            return result ? Ok($"{res.CountryName} ({res.CountryCode}) has been blocked") : Conflict($"{res.CountryName} is already blocked.");
         }
 
-        [HttpDelete("block/{countryCode}")]
-        public IActionResult GetBlockedCountry(string countryCode)
-        {
+            [HttpDelete("block/{countryCode}")]
+
+            public IActionResult GetBlockedCountry(string countryCode)
+            {
             var data = _countryService.RemoveBlockedCountry(countryCode);
 
             return data == true ? Ok() : NotFound();
-        }
+            }
 
 
         [HttpPost("temporal-block")]
@@ -76,6 +93,7 @@ namespace Geolocation_Task.Controllers
         {
             public int DurationMinutes { get; set; }
             public string CountryCode { get; set; }
+            public string CountryName { get; set; }
         }
 
 

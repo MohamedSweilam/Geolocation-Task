@@ -6,39 +6,43 @@ namespace Geolocation_Task.Services
 {
     public class BlockedCountryRepository : IBlockedCountryRepository
     {
-        private readonly ConcurrentDictionary<string, bool> _blockedCountries = new();
-        public bool AddBlockedCountry(string country)
-            => _blockedCountries.TryAdd(country.ToUpper(), true);
+        private readonly ConcurrentDictionary<string, string> _blockedCountries = new();
 
-        public List<string> GetAllBlockedCountries(int? page = null, int? pageSize = null)
+        public bool AddBlockedCountry(string countryCode, string countryName)
+            => _blockedCountries.TryAdd(countryCode.ToUpper(), countryName);
+
+        public List<KeyValuePair<string, string>> GetAllBlockedCountries(string? search = null, int? page = null, int? pageSize = null)
         {
-            if(page!=null || pageSize != null) 
+            var query = _blockedCountries.AsEnumerable();
+
+            // 🔍 Search by country code or name
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                return _blockedCountries
-                .OrderByDescending(k => k.Key)  // Sort by country code
-                .Skip((page.Value - 1) * pageSize.Value) // Skip previous pages
-                .Take(pageSize.Value)  // Limit results per page
-                .Select(k => k.Key)    // Extract only country codes
-                .ToList();
-            }
-            else
-            {
-                return _blockedCountries.Keys.ToList();
+                string searchLower = search.ToLower();
+                query = query.Where(c => c.Key.ToLower().Contains(searchLower) || c.Value.ToLower().Contains(searchLower));
             }
 
-            
+            // 📌 Sorting by country code
+            query = query.OrderBy(k => k.Key);
+
+            // 📖 Apply pagination if parameters are provided
+            if (page.HasValue && pageSize.HasValue)
+            {
+                query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            return query.ToList();
         }
 
+        public bool RemoveBlockedCountry(string countryCode)
+            => _blockedCountries.TryRemove(countryCode.ToUpper(), out _);
 
-        public bool RemoveBlockedCountry(string country)
-        => _blockedCountries.TryRemove(country.ToUpper(),out _);
         public bool CheckCountry(string countryCode)
-        {
-            return _blockedCountries.ContainsKey(countryCode);
-
-        }
-        
+            => _blockedCountries.ContainsKey(countryCode);
     }
 
-    
+
 }
+
+    
+
