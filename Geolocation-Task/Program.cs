@@ -1,6 +1,7 @@
 
 using Geolocation_Task.Repositories;
 using Geolocation_Task.Services;
+using Geolocation_Task.Services.Geolocation_Task.Services;
 
 namespace Geolocation_Task
 {
@@ -18,6 +19,7 @@ namespace Geolocation_Task
             builder.Services.AddControllers();
             builder.Services.AddHostedService<UnBlockExpiredCountries>();
             builder.Services.AddSingleton<ITemoprallyBlocked, TemporallyBlocked>();
+            builder.Services.AddSingleton<ILogAttemptsService, LogAttemptsService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

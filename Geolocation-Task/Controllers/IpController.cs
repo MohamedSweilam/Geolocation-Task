@@ -1,4 +1,5 @@
 ﻿using Geolocation_Task.Repositories;
+using Geolocation_Task.Services.Geolocation_Task.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,18 @@ namespace Geolocation_Task.Controllers
         private readonly IIpService _ipService;
         private readonly IBlockedCountryRepository _blockedCountry;
         private readonly ITemoprallyBlocked _temoprallyBlocked;
+        private readonly ILogAttemptsService _logAttemptsService; // Add this
 
-        public IpController(IIpService ipService, IBlockedCountryRepository blockedCountry , ITemoprallyBlocked temoprallyBlocked)
+        public IpController(
+            IIpService ipService,
+            IBlockedCountryRepository blockedCountry,
+            ITemoprallyBlocked temoprallyBlocked,
+            ILogAttemptsService logAttemptsService) // Inject here
         {
             _ipService = ipService;
             _blockedCountry = blockedCountry;
             _temoprallyBlocked = temoprallyBlocked;
+            _logAttemptsService = logAttemptsService; // Assign here
         }
 
         [HttpGet("lookup")]
@@ -36,23 +43,71 @@ namespace Geolocation_Task.Controllers
         [HttpGet("check-block")]
         public async Task<IActionResult> CheckBlock()
         {
-            
-              var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
 
             if (string.IsNullOrEmpty(ip))
                 return BadRequest("Unable to determine the IP address.");
 
             var result = await _ipService.GetCountryCode(ip);
 
-            if (_blockedCountry.CheckCountry(result.country_code))
-                return Conflict($"Blocked");
-            if(_temoprallyBlocked.IsCountryTemporarilyBlocked(result.country_code))
-                return Conflict($" Temporalily Blocked");
+            bool isBlocked = _blockedCountry.CheckCountry(result.country_code);
+            bool isTemporarilyBlocked = _temoprallyBlocked.IsCountryTemporarilyBlocked(result.country_code);
 
+            // Log the attempt before returning response
+            _logAttemptsService.LogBlockedAttempt(
+                ip,
+                result.country_code,
+                isBlocked || isTemporarilyBlocked,
+                HttpContext.Request.Headers["User-Agent"].ToString()
+            );
+
+            if (isBlocked)
+                return Conflict("Blocked");
+
+            if (isTemporarilyBlocked)
+                return Conflict("Temporarily Blocked");
 
             return Ok(result);
-
         }
-
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //[HttpGet("check-block")]
+    //public async Task<IActionResult> CheckBlock()
+    //{
+
+    //      var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+    //    if (string.IsNullOrEmpty(ip))
+    //        return BadRequest("Unable to determine the IP address.");
+
+    //    var result = await _ipService.GetCountryCode(ip);
+
+    //    if (_blockedCountry.CheckCountry(result.country_code))
+    //        return Conflict($"Blocked");
+    //    if (_temoprallyBlocked.IsCountryTemporarilyBlocked(result.country_code))
+    //        return Conflict($" Temporalily Blocked");
+
+    //    return Ok(result);
+
+    //}
+
 }
+

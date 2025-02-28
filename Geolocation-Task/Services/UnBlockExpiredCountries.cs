@@ -16,7 +16,7 @@ namespace Geolocation_Task.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                //_logger.LogInformation("Checking for expired country blocks...");
+                
                 _temoprallyBlocked.RemoveExpiredBlocks();
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }

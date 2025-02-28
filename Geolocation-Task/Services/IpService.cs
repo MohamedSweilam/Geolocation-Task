@@ -25,6 +25,7 @@ namespace Geolocation_Task.Services
 
             ip = _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
                   ?? _httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString();
+            
 
             if (IPAddress.TryParse(ip, out _))
             {
@@ -37,6 +38,8 @@ namespace Geolocation_Task.Services
                 if(data.Ip == null)
                 {
                     data.Ip = ip;
+                   
+
                 }
                 return data!;
             }
@@ -55,8 +58,9 @@ namespace Geolocation_Task.Services
             public string country_name { get; set; } = default!;
             public string country_code { get; set; } = default!;
             public string continent_name { get; set; } = default!;
-            
+           
 
         }
     }
 }
+
